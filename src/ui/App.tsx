@@ -1,8 +1,13 @@
-import { useState } from 'react'
-import './App.css'
+import { useEffect, useState } from "react";
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    // @ts-expect-error: a
+    window.electron.subscribeStatistics((stats) => console.log(stats));
+  }, []);
 
   return (
     <>
@@ -22,4 +27,4 @@ function App() {
   );
 }
 
-export default App
+export default App;

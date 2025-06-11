@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "types": ["./types"],
     "target": "esnext",
     "module": "esnext",
     "jsx": "react-jsx",
@@ -7,7 +8,8 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "noUnusedLocals": false
+    "noUnusedLocals": false,
+    "noImplicitAny": false
   },
   "files": [],
   "include": ["src"],
