@@ -25,5 +25,5 @@
     "composite": true, // ✅ 필수
     "emitDeclarationOnly": true // 또는 emit 관련 설정을 명확히
   },
-  "include": ["src"]
+  "include": ["src", "types.d.ts"]
 }
