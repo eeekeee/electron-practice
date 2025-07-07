@@ -1,5 +1,5 @@
 import { app, BrowserWindow, Menu } from "electron";
-import { ipcMainHandle, isDev } from "./util.js";
+import { ipcMainHandle, ipcMainOn, isDev } from "./util.js";
 import { getStaticData, pollResources } from "./resourceManager.js";
 import { getPreloadPath, getUIPath } from "./pathResolver.js";
 import { createTray } from "./tray.js";
@@ -12,6 +12,8 @@ app.on("ready", () => {
     webPreferences: {
       preload: getPreloadPath(),
     },
+    frame: false, // 프레임을 없애서 커스텀 타이틀바 사용
+    titleBarStyle: "hidden", // macOS 스타일 타이틀바 숨김
   });
 
   if (isDev()) {
@@ -24,6 +26,20 @@ app.on("ready", () => {
 
   ipcMainHandle("getStaticData", () => {
     return getStaticData();
+  });
+
+  ipcMainOn("sendFrameAction", (payload) => {
+    switch (payload) {
+      case "CLOSE":
+        mainWindow.close();
+        break;
+      case "MINIMIZE":
+        mainWindow.minimize();
+        break;
+      case "MAXIMIZE":
+        mainWindow.maximize();
+        break;
+    }
   });
 
   createTray(mainWindow);

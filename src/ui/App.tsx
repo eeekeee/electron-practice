@@ -7,22 +7,59 @@ import { Chart } from "./Chart";
 function App() {
   const [count, setCount] = useState(0);
   const statistics = useStatistics(10);
+  const [activeView, setActiveView] = useState<View>("CPU");
+
   const cpuUsages = useMemo(
     () => statistics.map((stat) => stat.cpuUsage),
     [statistics]
   );
+  const ramUsages = useMemo(
+    () => statistics.map((stat) => stat.ramUsage),
+    [statistics]
+  );
+  const storageUsages = useMemo(
+    () => statistics.map((stat) => stat.storageUsage),
+    [statistics]
+  );
 
-  // useEffect(() => {
-  //   const unsub = window.electron.subscribeStatistics((stats) =>
-  //     console.log(stats)
-  //   );
-  //   return unsub;
-  // }, []);
+  const activeUsages = useMemo(() => {
+    switch (activeView) {
+      case "CPU":
+        return cpuUsages;
+      case "RAM":
+        return ramUsages;
+      case "STORAGE":
+        return storageUsages;
+      default:
+        return cpuUsages; // Fallback to CPU if view is unknown
+    }
+  }, [activeView, cpuUsages, ramUsages, storageUsages]);
+
+  useEffect(() => {
+    return window.electron.subscribeChangeView((view) => {
+      console.log("View changed to:", view);
+      setActiveView(view);
+    });
+  }, []);
 
   return (
-    <>
+    <div className='App'>
+      <header>
+        <button
+          id='close'
+          onClick={() => window.electron.sendFrameAction("CLOSE")}
+        />
+        <button
+          id='minimize'
+          onClick={() => window.electron.sendFrameAction("MINIMIZE")}
+        />
+        <button
+          id='maximize'
+          onClick={() => window.electron.sendFrameAction("MAXIMIZE")}
+        />
+      </header>
       <div style={{ height: 120 }}>
-        <Chart data={cpuUsages} maxDataPoints={10} />
+        <Chart data={activeUsages} maxDataPoints={10} />
       </div>
       <div className='card'>
         <button onClick={() => setCount((count) => count + 1)}>
@@ -35,7 +72,7 @@ function App() {
       <p className='read-the-docs'>
         Click on the Vite and React logos to learn more
       </p>
-    </>
+    </div>
   );
 }
 
